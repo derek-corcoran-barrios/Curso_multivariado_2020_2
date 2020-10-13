@@ -52,8 +52,8 @@ for(i in 1:100){
   
   Modelo2 <- lm(mpg ~ hp + I(hp^2) + I(hp^3) + I(hp^4), data = Train)
   
-  Train$Pred <- predict(Modelo, Train)
-  Test$Pred <- predict(Modelo, Test)
+  Train$Pred <- predict(Modelo2, Train)
+  Test$Pred <- predict(Modelo2, Test)
   
   ## Para ver el poder predictivo
   
