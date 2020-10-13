@@ -4,7 +4,7 @@ library(caret)
 library(broom)
 
 data("mtcars")
-
+  
 index <- sample(1:nrow(mtcars), size = round(nrow(mtcars)/2))
 
 Train <- mtcars[index, ]
