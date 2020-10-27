@@ -1,69 +1,71 @@
-library(tidyverse)
-library(MuMIn)
-library(broom)
-library(caret)
-
-data("mtcars")
-
-## Generamos nuestos modelos
-
-fit1 <- lm(mpg ~ carb + cyl, data = mtcars)
-fit2 <- lm(mpg ~ cyl + wt, data = mtcars)
-fit3 <- lm(mpg ~ am + qsec + wt, data = mtcars)
-fit4 <- lm(mpg ~ carb + cyl + wt, data = mtcars)
-fit5 <- lm(mpg ~ am + carb + cyl + qsec + wt, data = mtcars)
-fit6 <- lm(mpg ~ am + carb + cyl + hp + qsec, data = mtcars)
-fit7 <- lm(mpg ~ carb, data = mtcars)
-fit8 <- lm(mpg ~ am + I(am^2) + carb + I(carb^2) + cyl + I(cyl^2) + hp + I(hp^2) + qsec, data = mtcars)
-
-## Los ponemos en una lista
-
-Modelos <- list(fit1, fit2, fit3, fit4, fit5, fit6, fit7, fit8)
-
-## Generamos la tabla de selección de modelos
-
-Select <- model.sel(Modelos)
-
-Selected <- subset(Select, delta <= 2)
-
-## Obtener el mejor modelo
-
-BestModel <- get.models(Select, 1)[[1]]
-
-
-
-############### opcion promediar modelos
-
-S <- as.data.frame(Selected)
-S <- as.data.frame(Selected) %>% select(cyl, weight)
-
-
-
-
-### Calculo full
-
-S_full <- S
-
-S_full <- S_full %>% 
-  mutate(cyl = ifelse(is.na(cyl), 0, cyl)) %>% 
-  mutate(Theta_i = cyl*weight) %>% 
-  summarise(Theta = sum(Theta_i))
-
-
-## Calculo subset
-
-
-S_Subset <- S
-
-S_Subset <- S_Subset %>% 
-  filter(!is.na(cyl)) %>% 
-  mutate(Theta_i = cyl*weight) %>% 
-  summarise(Theta = sum(Theta_i)/sum(weight)) 
-
-
-### Calculo del promedio de modelos con MuIn
-
-Modelo_Promedio <- model.avg(Select, subset = delta <= 2, fit = T)
+  library(tidyverse)
+  library(MuMIn)
+  library(broom)
+  library(caret)
+  
+  data("mtcars")
+  
+  ## Generamos nuestos modelos
+  
+  fit1 <- lm(mpg ~ carb + cyl, data = mtcars)
+  fit2 <- lm(mpg ~ cyl + wt, data = mtcars)
+  fit3 <- lm(mpg ~ am + qsec + wt, data = mtcars)
+  fit4 <- lm(mpg ~ carb + cyl + wt, data = mtcars)
+  fit5 <- lm(mpg ~ am + carb + cyl + qsec + wt, data = mtcars)
+  fit6 <- lm(mpg ~ am + carb + cyl + hp + qsec, data = mtcars)
+  fit7 <- lm(mpg ~ carb, data = mtcars)
+  fit8 <- lm(mpg ~ am + I(am^2) + carb + I(carb^2) + cyl + I(cyl^2) + hp + I(hp^2) + qsec, data = mtcars)
+  
+  ## Los ponemos en una lista
+  
+  Modelos <- list(fit1, fit2, fit3, fit4, fit5, fit6, fit7, fit8)
+  
+  ## Generamos la tabla de selección de modelos
+  
+SelectAIC <- model.sel(Modelos)
+SelectBIC <- model.sel(Modelos, rank = "BIC")
+  
+SelectedAIC <- subset(SelectAIC, delta <= 2)
+SelectedBIC <- subset(SelectBIC, delta <= 2)
+  
+  ## Obtener el mejor modelo
+  
+  BestModel <- get.models(Select, 1)[[1]]
+  
+  
+  
+  ############### opcion promediar modelos
+  
+  S <- as.data.frame(Selected)
+  S <- as.data.frame(Selected) %>% select(cyl, weight)
+  
+  
+  
+  
+  ### Calculo full
+  
+  S_full <- S
+  
+  S_full <- S_full %>% 
+    mutate(cyl = ifelse(is.na(cyl), 0, cyl)) %>% 
+    mutate(Theta_i = cyl*weight) %>% 
+    summarise(Theta = sum(Theta_i))
+  
+  
+  ## Calculo subset
+  
+  
+  S_Subset <- S
+  
+  S_Subset <- S_Subset %>% 
+    filter(!is.na(cyl)) %>% 
+    mutate(Theta_i = cyl*weight) %>% 
+    summarise(Theta = sum(Theta_i)/sum(weight)) 
+  
+  
+  ### Calculo del promedio de modelos con MuIn
+  
+  Modelo_Promedio <- model.avg(Select, subset = delta <= 2, fit = T)
 
 
 ####################################################
