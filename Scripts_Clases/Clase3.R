@@ -76,3 +76,18 @@ FitBin2 <- glm(Survived ~ Fare + Sex, data = train, family = binomial)
 DF <- data.frame(Fare = c(100, 100), Sex = c("male", "female"))
 
 predict(FitBin2, newdata = DF, type = "response") 
+
+
+
+set.seed(2020)
+X1 <- rnorm(100, mean = 90, sd = 10)
+X1 <- 1:100*X1
+
+set.seed(2020)
+X2 <- rnorm(100, mean = 50, sd = 10)
+X2 <-X2*seq(0, -100, length.out = 100)
+
+y = -3.4*X2 + 2.5*X1 + 25 + rnorm(100, mean = 0, sd = 20)
+
+
+lm(y~ X1 + X2)
